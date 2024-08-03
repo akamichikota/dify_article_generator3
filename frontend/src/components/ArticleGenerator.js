@@ -22,7 +22,8 @@ const ArticleGenerator = () => {
 
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        setArticles(prevArticles => [...prevArticles, data.answer]);
+        // タイトルと本文をまとめて表示
+        setArticles(prevArticles => [...prevArticles, { title: data.title, content: data.answer }]);
       };
 
       eventSource.onerror = (err) => {
@@ -66,7 +67,8 @@ const ArticleGenerator = () => {
         {articles.length > 0 ? (
           articles.map((article, index) => (
             <div key={index} style={{ marginBottom: '20px', border: '1px solid #ccc', padding: '10px' }}>
-              <ReactMarkdown>{article}</ReactMarkdown>
+              <h3>{article.title}</h3>
+              <ReactMarkdown>{article.content}</ReactMarkdown>
             </div>
           ))
         ) : (

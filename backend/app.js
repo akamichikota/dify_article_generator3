@@ -47,6 +47,7 @@ app.get('/generate-articles', async (req, res) => {
     responses.forEach(response => {
       let buffer = '';
       let finalAnswer = '';
+      let finalTitle = '';
 
       response.data.on('data', (chunk) => {
         buffer += chunk.toString();
@@ -58,12 +59,18 @@ app.get('/generate-articles', async (req, res) => {
             const jsonString = line.replace(/^data: /, '');
             try {
               const data = JSON.parse(jsonString);
-              if (data.event === 'message') {
-                finalAnswer += data.answer;
-              } else if (data.event === 'workflow_finished') {
-                finalAnswer = data.data.outputs.answer;
-                res.write(`data: ${JSON.stringify({ answer: finalAnswer })}\n\n`);
-                finalAnswer = ''; // 次のキーワードのためにリセット
+              console.log('Received data:', data); // 追加: 受信したデータをログに出力
+              if (data.event === 'node_finished') {
+                // indexとtitleを利用してノードを特定
+                if (data.data.index === 2 && data.data.title === 'LLM') {
+                  finalTitle = data.data.outputs.text; // LLMノードからタイトルを取得
+                } else if (data.data.index === 3 && data.data.title === 'LLM 2') {
+                  finalAnswer = data.data.outputs.text; // 次のノードから本文を取得
+                  // タイトルと本文をまとめて送信
+                  res.write(`data: ${JSON.stringify({ title: finalTitle, answer: finalAnswer })}\n\n`);
+                  finalTitle = '';
+                  finalAnswer = ''; // 次のキーワードのためにリセット
+                }
               }
             } catch (e) {
               console.error('Error parsing JSON:', e);
