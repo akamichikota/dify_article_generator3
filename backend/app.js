@@ -17,8 +17,9 @@ app.use(cors({
 }));
 
 let settings = {
-  title_prompt: "",
-  content_prompt: ""
+  title_prompt: '', // デフォルトを空文字列に設定
+  content_prompt: '', // デフォルトを空文字列に設定
+  api_endpoint: '' // デフォルトを空文字列に設定
 };
 
 // 設定を取得するエンドポイント
@@ -28,16 +29,17 @@ app.get('/settings', (req, res) => {
 
 // 設定を保存するエンドポイント
 app.post('/settings', (req, res) => {
-  const { title_prompt, content_prompt } = req.body;
-  settings.title_prompt = title_prompt;
-  settings.content_prompt = content_prompt;
+  const { title_prompt, content_prompt, api_endpoint } = req.body;
+  settings.title_prompt = title_prompt || ''; // 空白の場合は空文字列に設定
+  settings.content_prompt = content_prompt || ''; // 空白の場合は空文字列に設定
+  settings.api_endpoint = api_endpoint || ''; // 空白の場合は空文字列に設定
   res.json({ message: 'Settings updated successfully' });
 });
 
 app.get('/generate-articles', async (req, res) => {
   const { query } = req.query;
   const apiKey = process.env.DIFY_API_KEY;
-  const apiEndpoint = 'http://localhost/v1/chat-messages';
+  const apiEndpoint = settings.api_endpoint; // 設定からAPIエンドポイントを取得
 
   console.log(`Received request to generate articles with query: ${query}`);
 
@@ -67,10 +69,11 @@ app.get('/generate-articles', async (req, res) => {
 
     const responses = await Promise.all(requests);
 
-    responses.forEach(response => {
+    responses.forEach((response, index) => {
       let buffer = '';
       let finalAnswer = '';
       let finalTitle = '';
+      let titleConfirmed = false; // TITLEが取得されたかどうかを管理するフラグ
 
       response.data.on('data', (chunk) => {
         buffer += chunk.toString();
@@ -83,13 +86,22 @@ app.get('/generate-articles', async (req, res) => {
             try {
               const data = JSON.parse(jsonString);
               console.log('Received data:', data); // 追加: 受信したデータをログに出力
-              if (data.event === 'node_finished' && data.data.index === 3 && data.data.title === 'LLM') {
-                finalTitle = data.data.outputs.text;
-              } else if (data.event === 'workflow_finished') {
+              const currentKeyword = keywords[index]; // indexを使用して現在のキーワードを取得
+
+              if (data.event === 'node_finished') {
+                if (!titleConfirmed && data.data.title === 'TITLE') {
+                  finalTitle = data.data.outputs.text; // TITLEが取得できた場合
+                  titleConfirmed = true; // TITLEが取得されたことを記録
+                } else if (!titleConfirmed) {
+                  finalTitle = `${currentKeyword} - ${index + 1}`; // 現在のキーワードとインデックス番号+1を設定
+                }
+              }
+
+              if (data.event === 'workflow_finished') {
                 finalAnswer = data.data.outputs.answer;
                 res.write(`data: ${JSON.stringify({ title: finalTitle, answer: finalAnswer })}\n\n`);
                 finalTitle = '';
-                finalAnswer = ''; // 次のキーワードのためにリセット
+                finalAnswer = '';
               }
             } catch (e) {
               console.error('Error parsing JSON:', e);

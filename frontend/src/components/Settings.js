@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const Settings = () => {
-  const [titlePrompt, setTitlePrompt] = useState('');
-  const [contentPrompt, setContentPrompt] = useState('');
+  const [titlePrompt, setTitlePrompt] = useState(''); // 初期値を空文字列に設定
+  const [contentPrompt, setContentPrompt] = useState(''); // 初期値を空文字列に設定
+  const [apiEndpoint, setApiEndpoint] = useState(''); // 初期値を空文字列に設定
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -11,8 +12,9 @@ const Settings = () => {
     const fetchSettings = async () => {
       try {
         const response = await axios.get('http://localhost:3030/settings');
-        setTitlePrompt(response.data.title_prompt);
-        setContentPrompt(response.data.content_prompt);
+        setTitlePrompt(response.data.title_prompt || ''); // 空白の場合は空文字列に設定
+        setContentPrompt(response.data.content_prompt || ''); // 空白の場合は空文字列に設定
+        setApiEndpoint(response.data.api_endpoint || ''); // 空白の場合は空文字列に設定
       } catch (error) {
         console.error('設定の取得中にエラーが発生しました:', error);
       }
@@ -25,7 +27,8 @@ const Settings = () => {
     try {
       const response = await axios.post('http://localhost:3030/settings', {
         title_prompt: titlePrompt,
-        content_prompt: contentPrompt
+        content_prompt: contentPrompt,
+        api_endpoint: apiEndpoint
       });
       setMessage('設定が保存されました。');
     } catch (error) {
@@ -43,7 +46,7 @@ const Settings = () => {
           <input
             type="text"
             value={titlePrompt}
-            onChange={(e) => setTitlePrompt(e.target.value)}
+            onChange={(e) => setTitlePrompt(e.target.value || '')} // 空白の場合は空文字列に設定
           />
         </label>
       </div>
@@ -53,7 +56,18 @@ const Settings = () => {
           <input
             type="text"
             value={contentPrompt}
-            onChange={(e) => setContentPrompt(e.target.value)}
+            onChange={(e) => setContentPrompt(e.target.value || '')} // 空白の場合は空文字列に設定
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          APIエンドポイント:
+          <input
+            type="text"
+            value={apiEndpoint}
+            onChange={(e) => setApiEndpoint(e.target.value || '')} // 空白の場合は空文字列に設定
+            placeholder="APIエンドポイントを入力"
           />
         </label>
       </div>

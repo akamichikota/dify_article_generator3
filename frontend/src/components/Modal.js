@@ -5,8 +5,15 @@ import './Modal.css'; // スタイルを追加するためのCSSファイルを�
 const Modal = ({ isOpen, onClose, title, content }) => {
   if (!isOpen) return null;
 
+  const handleOverlayClick = (e) => {
+    // モーダルの外側がクリックされた場合に閉じる
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="modal-overlay">
+    <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal-content">
         <h2>{title}</h2>
         <ReactMarkdown>{content}</ReactMarkdown>
