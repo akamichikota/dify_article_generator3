@@ -4,6 +4,7 @@ import Modal from './Modal';
 
 const ArticleGenerator = () => {
   const [keywordsText, setKeywordsText] = useState('');
+  const [repeatCount, setRepeatCount] = useState(1); // 繰り返し回数の状態を追加
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -14,14 +15,24 @@ const ArticleGenerator = () => {
     setKeywordsText(event.target.value);
   };
 
+  const handleRepeatCountChange = (event) => {
+    setRepeatCount(event.target.value);
+  };
+
   const generateArticles = async () => {
     setLoading(true);
     setError(null);
     setArticles([]);
     const keywords = keywordsText.split('\n').filter(keyword => keyword.trim() !== '');
 
+    // キーワードを繰り返す
+    const repeatedKeywords = [];
+    for (let i = 0; i < repeatCount; i++) {
+      repeatedKeywords.push(...keywords);
+    }
+
     try {
-      const eventSource = new EventSource(`http://localhost:3030/generate-articles?query=${encodeURIComponent(keywords.join(', '))}`);
+      const eventSource = new EventSource(`http://localhost:3030/generate-articles?query=${encodeURIComponent(repeatedKeywords.join(', '))}`);
 
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -69,6 +80,16 @@ const ArticleGenerator = () => {
         rows="10"
         cols="30"
       />
+      <br />
+      <label>
+        繰り返し回数:
+        <input
+          type="number"
+          value={repeatCount}
+          onChange={handleRepeatCountChange}
+          min="1"
+        />
+      </label>
       <br />
       <button onClick={generateArticles} disabled={loading}>
         {loading ? '生成中...' : '記事生成'}
