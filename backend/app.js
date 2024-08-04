@@ -2,17 +2,37 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const bodyParser = require('body-parser');
 
 dotenv.config(); // 環境変数を読み込む
 
 const app = express();
 
 app.use(express.json());
+app.use(bodyParser.json());
 
 // CORSを有効にする
 app.use(cors({
   origin: 'http://localhost:3000'  // フロントエンドのURL
 }));
+
+let settings = {
+  title_prompt: "",
+  content_prompt: ""
+};
+
+// 設定を取得するエンドポイント
+app.get('/settings', (req, res) => {
+  res.json(settings);
+});
+
+// 設定を保存するエンドポイント
+app.post('/settings', (req, res) => {
+  const { title_prompt, content_prompt } = req.body;
+  settings.title_prompt = title_prompt;
+  settings.content_prompt = content_prompt;
+  res.json({ message: 'Settings updated successfully' });
+});
 
 app.get('/generate-articles', async (req, res) => {
   const { query } = req.query;
@@ -25,7 +45,10 @@ app.get('/generate-articles', async (req, res) => {
     const keywords = query.split(',').map(keyword => keyword.trim());
     const requests = keywords.map(keyword => 
       axios.post(apiEndpoint, {
-        inputs: {},
+        inputs: { 
+          title_prompt: settings.title_prompt,
+          content_prompt: settings.content_prompt
+        },
         query: keyword,
         response_mode: "streaming",
         user: "akamichi"
@@ -60,17 +83,13 @@ app.get('/generate-articles', async (req, res) => {
             try {
               const data = JSON.parse(jsonString);
               console.log('Received data:', data); // 追加: 受信したデータをログに出力
-              if (data.event === 'node_finished') {
-                // indexとtitleを利用してノードを特定
-                if (data.data.index === 2 && data.data.title === 'LLM') {
-                  finalTitle = data.data.outputs.text; // LLMノードからタイトルを取得
-                } else if (data.data.index === 3 && data.data.title === 'LLM 2') {
-                  finalAnswer = data.data.outputs.text; // 次のノードから本文を取得
-                  // タイトルと本文をまとめて送信
-                  res.write(`data: ${JSON.stringify({ title: finalTitle, answer: finalAnswer })}\n\n`);
-                  finalTitle = '';
-                  finalAnswer = ''; // 次のキーワードのためにリセット
-                }
+              if (data.event === 'node_finished' && data.data.index === 3 && data.data.title === 'LLM') {
+                finalTitle = data.data.outputs.text;
+              } else if (data.event === 'workflow_finished') {
+                finalAnswer = data.data.outputs.answer;
+                res.write(`data: ${JSON.stringify({ title: finalTitle, answer: finalAnswer })}\n\n`);
+                finalTitle = '';
+                finalAnswer = ''; // 次のキーワードのためにリセット
               }
             } catch (e) {
               console.error('Error parsing JSON:', e);

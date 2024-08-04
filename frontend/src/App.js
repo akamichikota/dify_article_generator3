@@ -1,13 +1,22 @@
 import React from 'react';
+import { Route, Routes, Link } from 'react-router-dom';
 import ArticleGenerator from './components/ArticleGenerator';
+import Settings from './components/Settings';
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
         <h1>自動記事生成ツール</h1>
-        <ArticleGenerator />
+        <nav>
+          <Link to="/">ホーム</Link>
+          <Link to="/settings">設定</Link>
+        </nav>
       </header>
+      <Routes>
+        <Route path="/" element={<ArticleGenerator />} />
+        <Route path="/settings" element={<Settings />} />
+      </Routes>
     </div>
   );
 }

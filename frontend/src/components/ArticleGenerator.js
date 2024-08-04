@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import Modal from './Modal';
 
 const ArticleGenerator = () => {
   const [keywordsText, setKeywordsText] = useState('');
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedArticle, setSelectedArticle] = useState(null);
 
   const handleChange = (event) => {
     setKeywordsText(event.target.value);
@@ -22,13 +25,12 @@ const ArticleGenerator = () => {
 
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        // タイトルと本文をまとめて表示
         setArticles(prevArticles => [...prevArticles, { title: data.title, content: data.answer }]);
       };
 
       eventSource.onerror = (err) => {
-        console.error('EventSource failed:', err);
-        setError('An error occurred while generating articles.');
+        console.error('EventSourceに失敗しました:', err);
+        setError('記事生成中にエラーが発生しました。');
         setLoading(false);
         eventSource.close();
       };
@@ -42,10 +44,20 @@ const ArticleGenerator = () => {
       });
 
     } catch (error) {
-      console.error('Error:', error);
-      setError('An error occurred while generating articles.');
+      console.error('エラー:', error);
+      setError('記事生成中にエラーが発生しました。');
       setLoading(false);
     }
+  };
+
+  const openModal = (article) => {
+    setSelectedArticle(article);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedArticle(null);
   };
 
   return (
@@ -53,7 +65,7 @@ const ArticleGenerator = () => {
       <textarea
         value={keywordsText}
         onChange={handleChange}
-        placeholder="Enter keywords, one per line"
+        placeholder="キーワードを入力"
         rows="10"
         cols="30"
       />
@@ -62,19 +74,34 @@ const ArticleGenerator = () => {
         {loading ? '生成中...' : '記事生成'}
       </button>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <h2>記事内容</h2>
+      <h2>生成された記事</h2>
       <div>
         {articles.length > 0 ? (
           articles.map((article, index) => (
-            <div key={index} style={{ marginBottom: '20px', border: '1px solid #ccc', padding: '10px' }}>
-              <h3>{article.title}</h3>
-              <ReactMarkdown>{article.content}</ReactMarkdown>
+            <div 
+              key={index} 
+              style={{ 
+                marginBottom: '5px', 
+                backgroundColor: 'rgba(144, 238, 144, 0.3)', // うっすら緑っぽく
+                padding: '1px',
+                borderRadius: '5px',
+                cursor: 'pointer'
+              }}
+              onClick={() => openModal(article)} // タイトルをクリックでモーダルを開く
+            >
+              <p>{article.title}</p>
             </div>
           ))
         ) : (
           null
         )}
       </div>
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={closeModal} 
+        title={selectedArticle?.title} 
+        content={selectedArticle?.content} 
+      />
     </div>
   );
 };
