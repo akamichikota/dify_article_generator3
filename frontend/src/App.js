@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>自動記事生成ツール</h1>
+        <h1>Article Generator</h1>
         <nav>
           <Link to="/">ホーム</Link>
           <Link to="/settings">設定</Link>

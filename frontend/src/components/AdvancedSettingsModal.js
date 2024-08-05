@@ -86,7 +86,7 @@ const AdvancedSettingsModal = ({ isOpen, onClose, apiEndpoint, setApiEndpoint, a
               value={variable3}
               onChange={(e) => setVariable3(e.target.value || '')}
               placeholder="変数３を入力"
-              rows="30"
+              rows="4"
               cols="50"
             />
           </label>

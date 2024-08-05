@@ -65,7 +65,7 @@ app.post('/settings', (req, res) => {
 });
 
 app.get('/generate-articles', async (req, res) => {
-  const { query } = req.query;
+  const { query, format } = req.query;
   const apiKey = settings.api_key || DEFAULT_API_KEY; // デフォルト値を設定
   const apiEndpoint = settings.api_endpoint || DEFAULT_API_ENDPOINT; // デフォルト値を設定
   const titlePrompt = settings.title_prompt || DEFAULT_TITLE_PROMPT; // デフォルト値を設定
@@ -77,7 +77,7 @@ app.get('/generate-articles', async (req, res) => {
   const variable5 = settings.variable5 || '';
 
   console.log(`記事生成リクエストを受信しました: ${query}`);
-  console.log('使用する設定:', { apiKey, apiEndpoint, titlePrompt, contentPrompt, variable1, variable2, variable3, variable4, variable5 });
+  console.log('使用する設定:', { apiKey, apiEndpoint, titlePrompt, contentPrompt, format, variable1, variable2, variable3, variable4, variable5 });
 
   try {
     const keywords = query.split(',').map(keyword => keyword.trim());
@@ -86,6 +86,7 @@ app.get('/generate-articles', async (req, res) => {
         inputs: {
           title_prompt: titlePrompt,
           content_prompt: contentPrompt,
+          format: format,
           variable1: variable1,
           variable2: variable2,
           variable3: variable3,

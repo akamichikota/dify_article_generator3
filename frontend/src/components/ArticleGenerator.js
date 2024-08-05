@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
 import Modal from './Modal';
 
 const ArticleGenerator = () => {
@@ -10,6 +9,7 @@ const ArticleGenerator = () => {
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState(null);
+  const [format, setFormat] = useState('デモ'); // デフォルトをデモに設定
 
   const handleChange = (event) => {
     setKeywordsText(event.target.value);
@@ -19,7 +19,16 @@ const ArticleGenerator = () => {
     setRepeatCount(event.target.value);
   };
 
+  const handleFormatChange = (event) => {
+    setFormat(event.target.value);
+  };
+
   const generateArticles = async () => {
+    if (!keywordsText.trim()) {
+      setError('キーワードを入力してください。');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setArticles([]);
@@ -31,8 +40,16 @@ const ArticleGenerator = () => {
       repeatedKeywords.push(...keywords);
     }
 
+    // formatの値を日本語に変換
+    const formatMap = {
+      'public': '公開',
+      'draft': '下書き',
+      'demo': 'デモ'
+    };
+    const japaneseFormat = formatMap[format] || 'デモ'; // デフォルト値を設定
+
     try {
-      const eventSource = new EventSource(`http://localhost:3030/generate-articles?query=${encodeURIComponent(repeatedKeywords.join(', '))}`);
+      const eventSource = new EventSource(`http://localhost:3030/generate-articles?query=${encodeURIComponent(repeatedKeywords.join(', '))}&format=${japaneseFormat}`);
 
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -91,12 +108,21 @@ const ArticleGenerator = () => {
         />
       </label>
       <br />
+      <label>
+        生成形式:
+        <select value={format} onChange={handleFormatChange}>
+          <option value="demo">デモ</option>
+          <option value="public">公開</option>
+          <option value="draft">下書き</option>
+        </select>
+      </label>
+      <br />
       <button onClick={generateArticles} disabled={loading}>
         {loading ? '生成中...' : '記事生成'}
       </button>
       {error && <p style={{ color: 'red' }}>{error}</p>}
-      <h2>生成された記事</h2>
-      <div>
+      
+      <div style={{ marginTop: '10px' }}>
         {articles.length > 0 ? (
           articles.map((article, index) => (
             <div 
