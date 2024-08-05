@@ -70,7 +70,6 @@ const Settings = () => {
 
   return (
     <div>
-      <h2>設定ページ</h2>
       <div>
         <label>
           タイトルプロンプト:
