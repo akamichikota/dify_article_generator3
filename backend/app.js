@@ -36,7 +36,11 @@ let settings = {
   content_prompt: '', // デフォルトを空文字列に設定
   api_endpoint: '', // デフォルトを空文字列に設定
   api_key: '', // デフォルトを空文字列に設定
-  variable1: '' // デフォルトを空文字列に設定
+  variable1: '', // デフォルトを空文字列に設定
+  variable2: '', // デフォルトを空文字列に設定
+  variable3: '', // デフォルトを空文字列に設定
+  variable4: '', // デフォルトを空文字列に設定
+  variable5: '' // デフォルトを空文字列に設定
 };
 
 // 設定を取得するエンドポイント
@@ -46,13 +50,17 @@ app.get('/settings', (req, res) => {
 
 // 設定を保存するエンドポイント
 app.post('/settings', (req, res) => {
-  const { title_prompt, content_prompt, api_endpoint, api_key, variable1 } = req.body;
-  console.log('受信した設定:', { title_prompt, content_prompt, api_endpoint, api_key, variable1 }); // 追加: 受信した設定をログに出力
+  const { title_prompt, content_prompt, api_endpoint, api_key, variable1, variable2, variable3, variable4, variable5 } = req.body;
+  console.log('受信した設定:', { title_prompt, content_prompt, api_endpoint, api_key, variable1, variable2, variable3, variable4, variable5 }); // 追加: 受信した設定をログに出力
   settings.title_prompt = title_prompt || ''; // 空白の場合は空文字列に設定
   settings.content_prompt = content_prompt || ''; // 空白の場合は空文字列に設定
   settings.api_endpoint = api_endpoint || ''; // 空白の場合は空文字列に設定
   settings.api_key = api_key || ''; // 空白の場合は空文字列に設定
   settings.variable1 = variable1 || ''; // 空白の場合は空文字列に設定
+  settings.variable2 = variable2 || ''; // 空白の場合は空文字列に設定
+  settings.variable3 = variable3 || ''; // 空白の場合は空文字列に設定
+  settings.variable4 = variable4 || ''; // 空白の場合は空文字列に設定
+  settings.variable5 = variable5 || ''; // 空白の場合は空文字列に設定
   res.json({ message: '設定が正常に更新されました' });
 });
 
@@ -63,9 +71,13 @@ app.get('/generate-articles', async (req, res) => {
   const titlePrompt = settings.title_prompt || DEFAULT_TITLE_PROMPT; // デフォルト値を設定
   const contentPrompt = settings.content_prompt || DEFAULT_CONTENT_PROMPT; // デフォルト値を設定
   const variable1 = settings.variable1 || '';
+  const variable2 = settings.variable2 || '';
+  const variable3 = settings.variable3 || '';
+  const variable4 = settings.variable4 || '';
+  const variable5 = settings.variable5 || '';
 
   console.log(`記事生成リクエストを受信しました: ${query}`);
-  console.log('使用する設定:', { apiKey, apiEndpoint, titlePrompt, contentPrompt, variable1 });
+  console.log('使用する設定:', { apiKey, apiEndpoint, titlePrompt, contentPrompt, variable1, variable2, variable3, variable4, variable5 });
 
   try {
     const keywords = query.split(',').map(keyword => keyword.trim());
@@ -74,7 +86,11 @@ app.get('/generate-articles', async (req, res) => {
         inputs: {
           title_prompt: titlePrompt,
           content_prompt: contentPrompt,
-          variable1: variable1
+          variable1: variable1,
+          variable2: variable2,
+          variable3: variable3,
+          variable4: variable4,
+          variable5: variable5
         },
         query: keyword,
         response_mode: "streaming",
