@@ -6,6 +6,7 @@ const Settings = () => {
   const [contentPrompt, setContentPrompt] = useState(''); // 初期値を空文字列に設定
   const [apiEndpoint, setApiEndpoint] = useState(''); // 初期値を空文字列に設定
   const [apiKey, setApiKey] = useState(''); // 初期値を空文字列に設定
+  const [variable1, setVariable1] = useState(''); // 初期値を空文字列に設定
   const [message, setMessage] = useState('');
 
   useEffect(() => {
@@ -17,6 +18,7 @@ const Settings = () => {
         setContentPrompt(response.data.content_prompt || ''); // 空白の場合は空文字列に設定
         setApiEndpoint(response.data.api_endpoint || ''); // 空白の場合は空文字列に設定
         setApiKey(response.data.api_key || ''); // 空白の場合は空文字列に設定
+        setVariable1(response.data.variable1 || ''); // 空白の場合は空文字列に設定
       } catch (error) {
         console.error('設定の取得中にエラーが発生しました:', error);
       }
@@ -27,11 +29,19 @@ const Settings = () => {
 
   const handleSave = async () => {
     try {
+      console.log('Saving settings:', {
+        title_prompt: titlePrompt,
+        content_prompt: contentPrompt,
+        api_endpoint: apiEndpoint,
+        api_key: apiKey,
+        variable1: variable1 // 追加: variable1の値をログに出力
+      });
       const response = await axios.post('http://localhost:3030/settings', {
         title_prompt: titlePrompt,
         content_prompt: contentPrompt,
         api_endpoint: apiEndpoint,
-        api_key: apiKey
+        api_key: apiKey,
+        variable1: variable1
       });
       setMessage('設定が保存されました。');
     } catch (error) {
@@ -46,22 +56,24 @@ const Settings = () => {
       <div>
         <label>
           タイトルプロンプト:
-          <input
-            type="text"
+          <textarea
             value={titlePrompt}
             onChange={(e) => setTitlePrompt(e.target.value || '')} // 空白の場合は空文字列に設定
             placeholder="どんなタイトルにしたいかを入力"
+            rows="4" // 必要に応じて行数を調整
+            cols="50" // 必要に応じて列数を調整
           />
         </label>
       </div>
       <div>
         <label>
           コンテンツプロンプト:
-          <input
-            type="text"
+          <textarea
             value={contentPrompt}
             onChange={(e) => setContentPrompt(e.target.value || '')} // 空白の場合は空文字列に設定
             placeholder="考慮してほしいことを入力"
+            rows="4" // 必要に応じて行数を調整
+            cols="50" // 必要に応じて列数を調整
           />
         </label>
       </div>
@@ -84,6 +96,18 @@ const Settings = () => {
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value || '')} // 空白の場合は空文字列に設定
             placeholder="APIキーを入力"
+          />
+        </label>
+      </div>
+      <div>
+        <label>
+          変数１:
+          <textarea
+            value={variable1}
+            onChange={(e) => setVariable1(e.target.value || '')} // 空白の場合は空文字列に設定
+            placeholder="変数１を入力"
+            rows="4" // 必要に応じて行数を調整
+            cols="50" // 必要に応じて列数を調整
           />
         </label>
       </div>
