@@ -13,8 +13,36 @@
 .modal-content {
   background: white;
   border-radius: 8px;
-  padding: 20px;
-  max-width: 600px; /* 最大幅を設定 */
-  max-height: 80vh; /* 最大高さを設定 */
+  padding: 30px; /* パディングを増やして余白を持たせる */
+  width: 45vw; /* 横幅を80vwに設定 */
+  height: 45vw; /* 縦幅を固定 */
   overflow-y: auto; /* 縦方向のオーバーフローを自動でスクロール */
+  display: flex;
+  flex-direction: column;
+  position: relative; /* バツ印ボタンの位置を相対的に設定 */
+}
+
+.modal-content h1, .modal-content .prose {
+  width: 100%;
+}
+
+.prose {
+  width: 100%; /* 横幅を最大に設定 */
+}
+
+.modal-content h1 {
+  margin-bottom: 20px; /* タイトルの下に余白を追加 */
+}
+
+.form-group {
+  margin-bottom: 16px; /* 各項目の間に余白を追加 */
+}
+
+.success-message {
+  color: green; /* 成功メッセージの文字色を緑に設定 */
+  margin: 10px auto; /* 上部と下部に余白を追加し、左右中央に表示 */
+}
+
+.modal-content label {
+  color: black; /* ラベルの文字色を黒色に設定 */
 }

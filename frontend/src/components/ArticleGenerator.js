@@ -89,54 +89,55 @@ const ArticleGenerator = () => {
   };
 
   return (
-    <div>
+    <div className="p-4">
+      キーワード
       <textarea
         value={keywordsText}
         onChange={handleChange}
-        placeholder="キーワードを入力"
+        placeholder="記事に含めるキーワードを入力"
         rows="10"
         cols="30"
+        className="w-full p-2 border border-gray-300 rounded text-black"
       />
       <br />
-      <label>
-        繰り返し回数:
-        <input
-          type="number"
-          value={repeatCount}
-          onChange={handleRepeatCountChange}
-          min="1"
-        />
+      <label className="block mt-4">
+        <div className="flex items-center justify-end">
+          <span>繰り返し回数</span>
+          <input
+            type="number"
+            value={repeatCount}
+            onChange={handleRepeatCountChange}
+            min="1"
+            className="ml-2 p-1 border border-gray-300 rounded text-black w-20"
+          />
+          <span className="ml-4">生成形式</span>
+          <select value={format} onChange={handleFormatChange} className="ml-2 p-1 border border-gray-300 rounded text-black">
+            <option value="demo">デモ</option>
+            <option value="public">公開</option>
+            <option value="draft">下書き</option>
+          </select>
+        </div>
       </label>
       <br />
-      <label>
-        生成形式:
-        <select value={format} onChange={handleFormatChange}>
-          <option value="demo">デモ</option>
-          <option value="public">公開</option>
-          <option value="draft">下書き</option>
-        </select>
-      </label>
-      <br />
-      <button onClick={generateArticles} disabled={loading}>
-        {loading ? '生成中...' : '記事生成'}
-      </button>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div className="flex justify-center">
+        <button onClick={generateArticles} disabled={loading} className={`mt-4 p-2 rounded text-white ${loading ? 'bg-magic-green' : 'bg-magic-blue hover:bg-magic-green'}`}>
+          {loading ? '生成中...' : '記事生成'}
+        </button>
+      </div>
+      {error && <p className="mt-4 text-red-500">{error}</p>}
       
-      <div style={{ marginTop: '10px' }}>
+      <div className="mt-4">
         {articles.length > 0 ? (
           articles.map((article, index) => (
             <div 
               key={index} 
-              style={{ 
-                marginBottom: '5px', 
-                backgroundColor: 'rgba(144, 238, 144, 0.3)', // うっすら緑っぽく
-                padding: '1px',
-                borderRadius: '5px',
-                cursor: 'pointer'
-              }}
-              onClick={() => openModal(article)} // タイトルをクリックでモーダルを開く
+              className="mb-2 p-2 bg-green-100 rounded cursor-pointer text-black flex items-center"
+              onClick={() => openModal(article)}
             >
-              <p>{article.title}</p>
+              <svg className="w-6 h-6 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <p className="flex-grow">{article.title}</p>
             </div>
           ))
         ) : (

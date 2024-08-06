@@ -15,9 +15,8 @@ const Modal = ({ isOpen, onClose, title, content }) => {
   return (
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal-content">
-        <h2>{title}</h2>
-        <ReactMarkdown>{content}</ReactMarkdown>
-        <button onClick={onClose}>閉じる</button>
+        <h1 className="text-2xl font-bold mb-4 text-black">{title}</h1>
+        <ReactMarkdown className="prose text-black">{content}</ReactMarkdown>
       </div>
     </div>
   );

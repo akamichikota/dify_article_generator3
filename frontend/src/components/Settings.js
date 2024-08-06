@@ -39,7 +39,7 @@ const Settings = () => {
 
   const handleSave = async () => {
     try {
-      console.log('Saving settings:', {
+      await axios.post('http://localhost:3030/settings', {
         title_prompt: titlePrompt,
         content_prompt: contentPrompt,
         api_endpoint: apiEndpoint,
@@ -50,53 +50,49 @@ const Settings = () => {
         variable4: variable4,
         variable5: variable5
       });
-      const response = await axios.post('http://localhost:3030/settings', {
-        title_prompt: titlePrompt,
-        content_prompt: contentPrompt,
-        api_endpoint: apiEndpoint,
-        api_key: apiKey,
-        variable1: variable1,
-        variable2: variable2,
-        variable3: variable3,
-        variable4: variable4,
-        variable5: variable5
-      });
-      setMessage('設定が保存されました。');
+      setMessage('設定が保存されました');
+      setTimeout(() => setMessage(''), 2000);
     } catch (error) {
       console.error('設定の保存中にエラーが発生しました:', error);
-      setMessage('設定の保存中にエラーが発生しました。');
+      setMessage('設定の保存中にエラーが発生しました');
+      setTimeout(() => setMessage(''), 2000);
     }
   };
 
   return (
-    <div>
-      <div>
-        <label>
-          タイトルプロンプト:
+    <div className="p-4">
+      <div className="mb-4">
+        <label className="block">
+          タイトル生成プロンプト
           <textarea
             value={titlePrompt}
-            onChange={(e) => setTitlePrompt(e.target.value || '')} // 空白の場合は空文字列に設定
+            onChange={(e) => setTitlePrompt(e.target.value || '')}
             placeholder="どんなタイトルにしたいかを入力"
-            rows="4" // 必要に応じて行数を調整
-            cols="50" // 必要に応じて列数を調整
+            rows="4"
+            cols="50"
+            className="w-full p-2 border border-gray-300 rounded text-black"
           />
         </label>
       </div>
-      <div>
-        <label>
-          コンテンツプロンプト:
+      <div className="mb-4">
+        <label className="block">
+          記事生成プロンプト
           <textarea
             value={contentPrompt}
-            onChange={(e) => setContentPrompt(e.target.value || '')} // 空白の場合は空文字列に設定
-            placeholder="考慮してほしいことを入力"
-            rows="4" // 必要に応じて行数を調整
-            cols="50" // 必要に応じて列数を調整
+            onChange={(e) => setContentPrompt(e.target.value || '')}
+            placeholder="記事生成において考慮してほしいことを入力"
+            rows="4"
+            cols="50"
+            className="w-full p-2 border border-gray-300 rounded text-black"
           />
         </label>
       </div>
-      <button onClick={handleSave}>保存</button>
-      <button onClick={() => setIsModalOpen(true)}>高度な設定</button>
-      {message && <p>{message}</p>}
+      <div className="flex justify-between">
+        <span className="p-2 bg-transparent border-none text-transparent" style={{ cursor: 'default' }}>　　　　</span>
+        <button onClick={handleSave} className="px-4 py-2 bg-magic-blue text-white rounded hover:bg-magic-green">保存</button>
+        <button onClick={() => setIsModalOpen(true)} className="p-2 bg-gray-500 text-white rounded hover:bg-gray-700">特殊設定</button>
+      </div>
+      {message && <p className="mt-4 text-green-500 text-center">{message}</p>}
       <AdvancedSettingsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
