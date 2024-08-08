@@ -140,7 +140,13 @@ const ArticleGenerator = () => {
           {loading ? '生成中...' : '記事生成'}
         </button>
       </div>
-      {error && <p className="mt-4 text-red-500">{error}</p>}
+      
+      {/* エラーメッセージを中央に表示 */}
+      {error && (
+        <div className="flex justify-center mt-4">
+          <p className="text-red-500">{error}</p>
+        </div>
+      )}
       
       <div className="mt-4">
         {articles.length > 0 ? (
