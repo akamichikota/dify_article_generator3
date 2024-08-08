@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Modal from './Modal';
 
 const ArticleGenerator = () => {
   const [keywordsText, setKeywordsText] = useState('');
-  const [repeatCount, setRepeatCount] = useState(1); // 繰り返し回数の状態を追加
-  const [articles, setArticles] = useState([]);
+  const [repeatCount, setRepeatCount] = useState(() => {
+    const savedCount = localStorage.getItem('repeatCount');
+    return savedCount ? parseInt(savedCount, 10) : 1; // デフォルトは1
+  });
+  const [articles, setArticles] = useState(() => {
+    const savedArticles = localStorage.getItem('articles');
+    return savedArticles ? JSON.parse(savedArticles) : []; // デフォルトは空配列
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState(null);
-  const [format, setFormat] = useState('デモ'); // デフォルトをデモに設定
+  const [format, setFormat] = useState(() => {
+    return localStorage.getItem('format') || 'デモ'; // デフォルトはデモ
+  });
+
+  useEffect(() => {
+    localStorage.setItem('repeatCount', repeatCount);
+    localStorage.setItem('format', format);
+    localStorage.setItem('articles', JSON.stringify(articles)); // 記事をlocalStorageに保存
+  }, [repeatCount, format, articles]);
 
   const handleChange = (event) => {
     setKeywordsText(event.target.value);
@@ -31,29 +45,31 @@ const ArticleGenerator = () => {
 
     setLoading(true);
     setError(null);
-    setArticles([]);
+    setArticles([]); // 既存の記事を消去
     const keywords = keywordsText.split('\n').filter(keyword => keyword.trim() !== '');
 
-    // キーワードを繰り返す
     const repeatedKeywords = [];
     for (let i = 0; i < repeatCount; i++) {
       repeatedKeywords.push(...keywords);
     }
 
-    // formatの値を日本語に変換
     const formatMap = {
       'public': '公開',
       'draft': '下書き',
       'demo': 'デモ'
     };
-    const japaneseFormat = formatMap[format] || 'デモ'; // デフォルト値を設定
+    const japaneseFormat = formatMap[format] || 'デモ';
 
     try {
       const eventSource = new EventSource(`http://localhost:3030/generate-articles?query=${encodeURIComponent(repeatedKeywords.join(', '))}&format=${japaneseFormat}`);
 
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data);
-        setArticles(prevArticles => [...prevArticles, { title: data.title, content: data.answer }]);
+        setArticles(prevArticles => {
+          const updatedArticles = [...prevArticles, { title: data.title, content: data.answer }];
+          localStorage.setItem('articles', JSON.stringify(updatedArticles)); // 記事をlocalStorageに保存
+          return updatedArticles;
+        });
       };
 
       eventSource.onerror = (err) => {

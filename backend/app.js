@@ -20,15 +20,16 @@ app.use(cors({
 const DEFAULT_TITLE_PROMPT = `
 Q&A式の記事を書きたいので、タイトルには「？」を含めてください。
 人間の悩みに注目してタイトルを考えてください。
-タイトルはよくある質問や疑問を反映させるものにしてください。
+タイトルはよくある質問や疑問を反映させるものにし、読者の興味を引くようなキャッチーな言葉やフレーズを使ってください。
 `;
 
 const DEFAULT_CONTENT_PROMPT = `
+- 最初の数行で読者の興味を引き、続きを読みたくなるようにしてください。
 - 必ず日本の情報を参照してください。日本語以外をベースに書かれた情報は参照しないでください。なぜなら、記事を自然な日本語にするためです。
 - 文章量は必ず2000文字以上にしてください。
 `;
 
-const DEFAULT_API_ENDPOINT = 'http://localhost/v1/chat-messages';
+const DEFAULT_API_ENDPOINT = 'https://api.dify.ai/v1/chat-messages';
 const DEFAULT_API_KEY = process.env.DIFY_API_KEY || 'default_api_key_null';
 
 let settings = {
