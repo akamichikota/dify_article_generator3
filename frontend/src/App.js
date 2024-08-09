@@ -9,18 +9,18 @@ function App() {
   const [xServerUrl, setXServerUrl] = useState('https://www.xserver.ne.jp');
   const [rakkokeywordUrl, setRakkokeywordUrl] = useState('https://rakkokeyword.com');
 
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/settings`);
-        setKeywordGeneratorUrl(response.data.keyword_generator_url || 'https://chatgpt.com/g/g-VnqYVwsJ6-kiwatosheng-cheng');
-        setXServerUrl(response.data.x_server_url || 'https://www.xserver.ne.jp');
-        setRakkokeywordUrl(response.data.rakkokeyword_url || 'https://rakkokeyword.com');
-      } catch (error) {
-        console.error('設定の取得中にエラーが発生しました:', error);
-      }
-    };
+  const fetchSettings = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/settings`);
+      setKeywordGeneratorUrl(response.data.keyword_generator_url || 'https://chatgpt.com/g/g-VnqYVwsJ6-kiwatosheng-cheng');
+      setXServerUrl(response.data.x_server_url || 'https://www.xserver.ne.jp');
+      setRakkokeywordUrl(response.data.rakkokeyword_url || 'https://rakkokeyword.com');
+    } catch (error) {
+      console.error('設定の取得中にエラーが発生しました:', error);
+    }
+  };
 
+  useEffect(() => {
     fetchSettings();
   }, []);
 
@@ -43,6 +43,7 @@ function App() {
             setKeywordGeneratorUrl={setKeywordGeneratorUrl}
             setXServerUrl={setXServerUrl}
             setRakkokeywordUrl={setRakkokeywordUrl}
+            fetchSettings={fetchSettings}
           />} />
         </Routes>
       </main>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdvancedSettingsModal from './AdvancedSettingsModal';
 
-const Settings = () => {
+const Settings = ({ fetchSettings }) => {
   const [titlePrompt, setTitlePrompt] = useState(''); // 初期値を空文字列に設定
   const [contentPrompt, setContentPrompt] = useState(''); // 初期値を空文字列に設定
   const [apiEndpoint, setApiEndpoint] = useState(''); // 初期値を空文字列に設定
@@ -14,7 +14,7 @@ const Settings = () => {
   const [variable5, setVariable5] = useState(''); // 初期値を空文字列に設定
   const [message, setMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [keywordGeneratorUrl, setKeywordGeneratorUrl] = useState(''); // 追加: キーワード生成URLの状態
+  const [keywordGeneratorUrl, setKeywordGeneratorUrl] = useState(''); // ���: キーワード生成URLの状態
   const [xServerUrl, setXServerUrl] = useState(''); // 追加: XサーバーURLの状態
   const [rakkokeywordUrl, setRakkokeywordUrl] = useState(''); // 追加: ラッコキーワードURLの状態
 
@@ -60,10 +60,9 @@ const Settings = () => {
         rakkokeyword_url: rakkokeywordUrl
       });
 
-      // 設定が保存された後にURLを更新
-      setKeywordGeneratorUrl(keywordGeneratorUrl);
-      setXServerUrl(xServerUrl);
-      setRakkokeywordUrl(rakkokeywordUrl);
+      // 設定が保存された後に最新の設定を取得
+      console.log('設定が保存されました。fetchSettingsを呼び出します。');
+      await fetchSettings(); // これを追加
 
       setMessage('設定が保存されました');
       setTimeout(() => setMessage(''), 2000);
@@ -131,6 +130,7 @@ const Settings = () => {
         setXServerUrl={setXServerUrl}
         rakkokeywordUrl={rakkokeywordUrl}
         setRakkokeywordUrl={setRakkokeywordUrl}
+        fetchSettings={fetchSettings} // ここでfetchSettingsを渡す
       />
     </div>
   );

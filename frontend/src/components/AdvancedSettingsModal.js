@@ -24,7 +24,8 @@ const AdvancedSettingsModal = ({
   xServerUrl,
   setXServerUrl,
   rakkokeywordUrl,
-  setRakkokeywordUrl
+  setRakkokeywordUrl,
+  fetchSettings // ここで受け取る
 }) => {
   const [successMessage, setSuccessMessage] = useState(''); // 成功メッセージの状態を追加
   const [errorMessage, setErrorMessage] = useState(''); // エラーメッセージの状態を追加
@@ -58,6 +59,10 @@ const AdvancedSettingsModal = ({
       setKeywordGeneratorUrl(keywordGeneratorUrl);
       setXServerUrl(xServerUrl);
       setRakkokeywordUrl(rakkokeywordUrl);
+
+      // ここでfetchSettingsを呼び出す
+      console.log('fetchSettingsを呼び出します。');
+      await fetchSettings(); // これを追加
 
       setTimeout(() => setSuccessMessage(''), 2000);
     } catch (error) {
