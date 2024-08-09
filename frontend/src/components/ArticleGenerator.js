@@ -19,6 +19,11 @@ const ArticleGenerator = () => {
     return localStorage.getItem('format') || 'デモ'; // デフォルトはデモ
   });
 
+  // コンポーネントがマウントされたときに環境変数をログに出力
+  useEffect(() => {
+    console.log('API URL:', process.env.REACT_APP_API_URL); // 環境変数の確認
+  }, []);
+
   useEffect(() => {
     localStorage.setItem('repeatCount', repeatCount);
     localStorage.setItem('format', format);
@@ -60,8 +65,11 @@ const ArticleGenerator = () => {
     };
     const japaneseFormat = formatMap[format] || 'デモ';
 
+    const apiUrl = `${process.env.REACT_APP_API_URL}/generate-articles?query=${encodeURIComponent(repeatedKeywords.join(', '))}&format=${japaneseFormat}`;
+    console.log('API URL:', apiUrl); // 追加: API URLをログに出力
+
     try {
-      const eventSource = new EventSource(`http://localhost:3030/generate-articles?query=${encodeURIComponent(repeatedKeywords.join(', '))}&format=${japaneseFormat}`);
+      const eventSource = new EventSource(apiUrl);
 
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data);

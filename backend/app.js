@@ -3,6 +3,7 @@ const axios = require('axios');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 dotenv.config(); // 環境変数を読み込む
 
@@ -11,10 +12,11 @@ const app = express();
 app.use(express.json());
 app.use(bodyParser.json());
 
-// CORSを有効にする
+// CORSを有効にする（開発中のみ）
 app.use(cors({
   origin: 'http://localhost:3000'  // フロントエンドのURL
 }));
+
 
 // デフォルト値を定義
 const DEFAULT_TITLE_PROMPT = `
@@ -24,7 +26,7 @@ Q&A式の記事を書きたいので、タイトルには「？」を含めて�
 `;
 
 const DEFAULT_CONTENT_PROMPT = `
-- 最初の数行で読者の興味を引き、続きを読みたくなるようにしてください。
+- 最初の数行で読者の興味を引き、続きを読みみたくなるようにしてください。
 - 必ず日本の情報を参照してください。日本語以外をベースに書かれた情報は参照しないでください。なぜなら、記事を自然な日本語にするためです。
 - 文章量は必ず2000文字以上にしてください。
 `;
@@ -41,32 +43,50 @@ let settings = {
   variable2: '', // デフォルトを空文字列に設定
   variable3: '', // デフォルトを空文字列に設定
   variable4: '', // デフォルトを空文字列に設定
-  variable5: '' // デフォルトを空文字列に設定
+  variable5: '', // デフォルトを空文字列に設定
+  keyword_generator_url: '', // 新しいフィールドを追加
+  x_server_url: '', // 新しいフィールドを追加
+  rakkokeyword_url: '' // 新しいフィールドを追加
 };
 
 // 設定を取得するエンドポイント
 app.get('/settings', (req, res) => {
+  console.log('GET /settings リクエストを受信しました'); // ログ出力
   res.json(settings);
 });
 
 // 設定を保存するエンドポイント
 app.post('/settings', (req, res) => {
-  const { title_prompt, content_prompt, api_endpoint, api_key, variable1, variable2, variable3, variable4, variable5 } = req.body;
-  console.log('受信した設定:', { title_prompt, content_prompt, api_endpoint, api_key, variable1, variable2, variable3, variable4, variable5 }); // 追加: 受信した設定をログに出力
-  settings.title_prompt = title_prompt || ''; // 空白の場合は空文字列に設定
-  settings.content_prompt = content_prompt || ''; // 空白の場合は空文字列に設定
-  settings.api_endpoint = api_endpoint || ''; // 空白の場合は空文字列に設定
-  settings.api_key = api_key || ''; // 空白の場合は空文字列に設定
-  settings.variable1 = variable1 || ''; // 空白の場合は空文字列に設定
-  settings.variable2 = variable2 || ''; // 空白の場合は空文字列に設定
-  settings.variable3 = variable3 || ''; // 空白の場合は空文字列に設定
-  settings.variable4 = variable4 || ''; // 空白の場合は空文字列に設定
-  settings.variable5 = variable5 || ''; // 空白の場合は空文字列に設定
-  res.json({ message: '設定が正常に更新されました' });
+  console.log('POST /settings リクエストを受信しました:', req.body); // 追加: リクエストボディをログに出力
+  try {
+    const { title_prompt, content_prompt, api_endpoint, api_key, variable1, variable2, variable3, variable4, variable5, keyword_generator_url, x_server_url, rakkokeyword_url } = req.body;
+    
+    // 受信したデータを設定に保存
+    settings.title_prompt = title_prompt || '';
+    settings.content_prompt = content_prompt || '';
+    settings.api_endpoint = api_endpoint || '';
+    settings.api_key = api_key || '';
+    settings.variable1 = variable1 || '';
+    settings.variable2 = variable2 || '';
+    settings.variable3 = variable3 || '';
+    settings.variable4 = variable4 || '';
+    settings.variable5 = variable5 || '';
+    settings.keyword_generator_url = keyword_generator_url || ''; // URLを保存
+    settings.x_server_url = x_server_url || ''; // URLを保存
+    settings.rakkokeyword_url = rakkokeyword_url || ''; // URLを保存
+
+    res.json({ message: '設定が正常に更新されました' });
+  } catch (error) {
+    console.error('設定の保存中にエラーが発生しました:', error);
+    res.status(500).json({ error: '設定の保存中にエラーが発生しました' });
+  }
 });
 
 app.get('/generate-articles', async (req, res) => {
+  console.log('GET /generate-articles リクエストを受信しました:', req.query); // 追加: リクエストのクエリをログに出力
   const { query, format } = req.query;
+  console.log(`クエリ: ${query}, フォーマット: ${format}`); // 追加: クエリとフォーマットをログに出力
+
   const apiKey = settings.api_key || DEFAULT_API_KEY; // デフォルト値を設定
   const apiEndpoint = settings.api_endpoint || DEFAULT_API_ENDPOINT; // デフォルト値を設定
   const titlePrompt = settings.title_prompt || DEFAULT_TITLE_PROMPT; // デフォルト値を設定
@@ -78,7 +98,6 @@ app.get('/generate-articles', async (req, res) => {
   const variable5 = settings.variable5 || '';
 
   console.log(`記事生成リクエストを受信しました: ${query}`);
-  console.log('使用する設定:', { apiKey, apiEndpoint, titlePrompt, contentPrompt, format, variable1, variable2, variable3, variable4, variable5 });
 
   try {
     const keywords = query.split(',').map(keyword => keyword.trim());
@@ -103,9 +122,13 @@ app.get('/generate-articles', async (req, res) => {
           'Content-Type': 'application/json'
         },
         responseType: 'stream'
+      }).catch(err => {
+        console.error(`APIリクエスト中にエラーが発生しました: ${err.message}`);
+        throw new Error('APIリクエスト中にエラーが発生しました');
       })
     );
 
+    // MIMEタイプを設定
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -116,7 +139,7 @@ app.get('/generate-articles', async (req, res) => {
       let buffer = '';
       let finalAnswer = '';
       let finalTitle = '';
-      let titleConfirmed = false; // TITLEが取得されたかどうかを管理するフラグ
+      let titleConfirmed = false;
 
       response.data.on('data', (chunk) => {
         buffer += chunk.toString();
@@ -128,21 +151,21 @@ app.get('/generate-articles', async (req, res) => {
             const jsonString = line.replace(/^data: /, '');
             try {
               const data = JSON.parse(jsonString);
-              console.log('受信したデータ:', data); // 追加: 受信したデータをログに出力
-              const currentKeyword = keywords[index]; // indexを使って現在のキーワードを取得
+              console.log('受信したデータ:', data);
+              const currentKeyword = keywords[index];
 
               if (data.event === 'node_finished') {
                 if (!titleConfirmed && data.data.title === 'TITLE') {
-                  finalTitle = data.data.outputs.text; // TITLEが取得できた場合
-                  titleConfirmed = true; // TITLEが取得されたことを記録
+                  finalTitle = data.data.outputs.text;
+                  titleConfirmed = true;
                 } else if (!titleConfirmed) {
-                  finalTitle = `${currentKeyword} - ${index + 1}`; // 現在のキーワードとインデックス番号+1を設定
+                  finalTitle = `${currentKeyword} - ${index + 1}`;
                 }
               }
 
               if (data.event === 'workflow_finished') {
                 finalAnswer = data.data.outputs.answer;
-                res.write(`data: ${JSON.stringify({ title: finalTitle, answer: finalAnswer })}\n\n`);
+                res.write(`event: message\ndata: ${JSON.stringify({ title: finalTitle, answer: finalAnswer })}\n\n`);
                 finalTitle = '';
                 finalAnswer = '';
               }
@@ -171,8 +194,16 @@ app.get('/generate-articles', async (req, res) => {
 
   } catch (error) {
     console.error('記事生成中のエラー:', error.message);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: '記事生成中にエラーが発生しました' });
   }
+});
+
+// フロントエンドの静的ファイルを提供
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// すべてのリクエストに対してindex.htmlを返す
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 
 const PORT = process.env.PORT || 3030;

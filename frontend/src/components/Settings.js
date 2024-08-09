@@ -14,12 +14,15 @@ const Settings = () => {
   const [variable5, setVariable5] = useState(''); // 初期値を空文字列に設定
   const [message, setMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [keywordGeneratorUrl, setKeywordGeneratorUrl] = useState(''); // 追加: キーワード生成URLの状態
+  const [xServerUrl, setXServerUrl] = useState(''); // 追加: XサーバーURLの状態
+  const [rakkokeywordUrl, setRakkokeywordUrl] = useState(''); // 追加: ラッコキーワードURLの状態
 
   useEffect(() => {
     // 設定を取得する
     const fetchSettings = async () => {
       try {
-        const response = await axios.get('http://localhost:3030/settings');
+        const response = await axios.get(`${process.env.REACT_APP_API_URL}/settings`);
         setTitlePrompt(response.data.title_prompt || ''); // 空白の場合は空文字列に設定
         setContentPrompt(response.data.content_prompt || ''); // 空白の場合は空文字列に設定
         setApiEndpoint(response.data.api_endpoint || ''); // 空白の場合は空文字列に設定
@@ -29,6 +32,9 @@ const Settings = () => {
         setVariable3(response.data.variable3 || ''); // 空白の場合は空文字列に設定
         setVariable4(response.data.variable4 || ''); // 空白の場合は空文字列に設定
         setVariable5(response.data.variable5 || ''); // 空白の場合は空文字列に設定
+        setKeywordGeneratorUrl(response.data.keyword_generator_url || ''); // 追加: キーワード生成URLを設定
+        setXServerUrl(response.data.x_server_url || ''); // 追加: XサーバーURLを設定
+        setRakkokeywordUrl(response.data.rakkokeyword_url || ''); // 追加: ラッコキーワードURLを設定
       } catch (error) {
         console.error('設定の取得中にエラーが発生しました:', error);
       }
@@ -39,7 +45,7 @@ const Settings = () => {
 
   const handleSave = async () => {
     try {
-      await axios.post('http://localhost:3030/settings', {
+      await axios.post(`${process.env.REACT_APP_API_URL}/settings`, {
         title_prompt: titlePrompt,
         content_prompt: contentPrompt,
         api_endpoint: apiEndpoint,
@@ -48,8 +54,17 @@ const Settings = () => {
         variable2: variable2,
         variable3: variable3,
         variable4: variable4,
-        variable5: variable5
+        variable5: variable5,
+        keyword_generator_url: keywordGeneratorUrl,
+        x_server_url: xServerUrl,
+        rakkokeyword_url: rakkokeywordUrl
       });
+
+      // 設定が保存された後にURLを更新
+      setKeywordGeneratorUrl(keywordGeneratorUrl);
+      setXServerUrl(xServerUrl);
+      setRakkokeywordUrl(rakkokeywordUrl);
+
       setMessage('設定が保存されました');
       setTimeout(() => setMessage(''), 2000);
     } catch (error) {
@@ -110,6 +125,12 @@ const Settings = () => {
         setVariable4={setVariable4}
         variable5={variable5}
         setVariable5={setVariable5}
+        keywordGeneratorUrl={keywordGeneratorUrl}
+        setKeywordGeneratorUrl={setKeywordGeneratorUrl}
+        xServerUrl={xServerUrl}
+        setXServerUrl={setXServerUrl}
+        rakkokeywordUrl={rakkokeywordUrl}
+        setRakkokeywordUrl={setRakkokeywordUrl}
       />
     </div>
   );

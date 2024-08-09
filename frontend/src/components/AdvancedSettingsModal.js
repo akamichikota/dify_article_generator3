@@ -2,7 +2,30 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import './Modal.css'; // 既存のモーダルスタイルを再利用
 
-const AdvancedSettingsModal = ({ isOpen, onClose, apiEndpoint, setApiEndpoint, apiKey, setApiKey, variable1, setVariable1, variable2, setVariable2, variable3, setVariable3, variable4, setVariable4, variable5, setVariable5 }) => {
+const AdvancedSettingsModal = ({
+  isOpen,
+  onClose,
+  apiEndpoint,
+  setApiEndpoint,
+  apiKey,
+  setApiKey,
+  variable1,
+  setVariable1,
+  variable2,
+  setVariable2,
+  variable3,
+  setVariable3,
+  variable4,
+  setVariable4,
+  variable5,
+  setVariable5,
+  keywordGeneratorUrl,
+  setKeywordGeneratorUrl,
+  xServerUrl,
+  setXServerUrl,
+  rakkokeywordUrl,
+  setRakkokeywordUrl
+}) => {
   const [successMessage, setSuccessMessage] = useState(''); // 成功メッセージの状態を追加
   const [errorMessage, setErrorMessage] = useState(''); // エラーメッセージの状態を追加
 
@@ -16,22 +39,31 @@ const AdvancedSettingsModal = ({ isOpen, onClose, apiEndpoint, setApiEndpoint, a
 
   const handleSave = async () => {
     try {
-      const response = await axios.post('http://localhost:3030/settings', {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/settings`, {
         api_endpoint: apiEndpoint,
         api_key: apiKey,
         variable1: variable1,
         variable2: variable2,
         variable3: variable3,
         variable4: variable4,
-        variable5: variable5
+        variable5: variable5,
+        keyword_generator_url: keywordGeneratorUrl,
+        x_server_url: xServerUrl,
+        rakkokeyword_url: rakkokeywordUrl
       });
       console.log('高度な設定が保存されました:', response.data);
-      setSuccessMessage('設定が保存されました'); // 成功メッセージを設定
-      setTimeout(() => setSuccessMessage(''), 2000); // 3秒後にメッセージを消す
+      setSuccessMessage('設定が保存されました');
+
+      // 親コンポーネントの状態を更新
+      setKeywordGeneratorUrl(keywordGeneratorUrl);
+      setXServerUrl(xServerUrl);
+      setRakkokeywordUrl(rakkokeywordUrl);
+
+      setTimeout(() => setSuccessMessage(''), 2000);
     } catch (error) {
       console.error('高度な設定の保存中にエラーが発生しました:', error);
-      setErrorMessage('保存中にエラーが発生しました'); // エラーメッセージを設定
-      setTimeout(() => setErrorMessage(''), 2000); // 2秒後にメッセージを消す
+      setErrorMessage('保存中にエラーが発生しました');
+      setTimeout(() => setErrorMessage(''), 2000);
     }
   };
 
@@ -39,6 +71,42 @@ const AdvancedSettingsModal = ({ isOpen, onClose, apiEndpoint, setApiEndpoint, a
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="modal-content">
         <h1 style={{ color: 'black', fontWeight: 'bold', fontSize: 'larger' }}>特殊設定</h1>
+        <div className="form-group">
+          <label>
+            キーワード生成URL
+            <input
+              type="text"
+              value={keywordGeneratorUrl}
+              onChange={(e) => setKeywordGeneratorUrl(e.target.value || '')}
+              placeholder="キーワード生成のURLを入力"
+              className="w-full p-2 border border-gray-300 rounded text-black"
+            />
+          </label>
+        </div>
+        <div className="form-group">
+          <label>
+            XサーバーURL
+            <input
+              type="text"
+              value={xServerUrl}
+              onChange={(e) => setXServerUrl(e.target.value || '')}
+              placeholder="XサーバーのURLを入力"
+              className="w-full p-2 border border-gray-300 rounded text-black"
+            />
+          </label>
+        </div>
+        <div className="form-group">
+          <label>
+            ラッコキーワードURL
+            <input
+              type="text"
+              value={rakkokeywordUrl}
+              onChange={(e) => setRakkokeywordUrl(e.target.value || '')}
+              placeholder="ラッコキーワードのURLを入力"
+              className="w-full p-2 border border-gray-300 rounded text-black"
+            />
+          </label>
+        </div>
         <div className="form-group">
           <label>
             Dify APIエンドポイント
