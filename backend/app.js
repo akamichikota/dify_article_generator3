@@ -4,6 +4,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const path = require('path');
+const wordpressRouter = require('./wordpress'); // 新しいルーターをインポート
 
 dotenv.config(); // 環境変数を読み込む
 
@@ -82,7 +83,10 @@ app.post('/settings', (req, res) => {
   }
 });
 
-app.get('/generate-articles', async (req, res) => {
+// WordPressへの投稿エンドポイントを使用
+app.use('/api', wordpressRouter); // 新しいルーターを追加
+
+app.get('/generate-articles', async (req, res) => { // ここを async にする
   console.log('GET /generate-articles リクエストを受信しました:', req.query); // 追加: リクエストのクエリをログに出力
   const { query, format } = req.query;
   console.log(`クエリ: ${query}, フォーマット: ${format}`); // 追加: クエリとフォーマットをログに出力
@@ -109,13 +113,13 @@ app.get('/generate-articles', async (req, res) => {
           format: format,
           variable1: variable1,
           variable2: variable2,
-          wordpress_username: wordpressUsername, // 変更
-          application_password: applicationPassword, // 変更
-          siteurl: siteUrl // 変更
+          wordpress_username: wordpressUsername,
+          application_password: applicationPassword,
+          siteurl: siteUrl
         },
         query: keyword,
         response_mode: "streaming",
-        user: "akamichi"
+        user: wordpressUsername // 変更: ここを受け取ったwordpressUsernameに変更
       }, {
         headers: {
           'Authorization': `Bearer ${apiKey}`,
@@ -133,7 +137,7 @@ app.get('/generate-articles', async (req, res) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    const responses = await Promise.all(requests);
+    const responses = await Promise.all(requests); // ここで await を使用
 
     responses.forEach((response, index) => {
       let buffer = '';
@@ -141,7 +145,7 @@ app.get('/generate-articles', async (req, res) => {
       let finalTitle = '';
       let titleConfirmed = false;
 
-      response.data.on('data', (chunk) => {
+      response.data.on('data', async (chunk) => { // ここを async にする
         buffer += chunk.toString();
         const lines = buffer.split('\n');
         buffer = lines.pop();
@@ -165,6 +169,19 @@ app.get('/generate-articles', async (req, res) => {
 
               if (data.event === 'workflow_finished') {
                 finalAnswer = data.data.outputs.answer;
+
+                // formatがdemoでない場合のみWordPressへの投稿を呼び出す
+                if (format !== 'demo') {
+                  await axios.post(`${process.env.API_URL}/api/post-to-wordpress`, {
+                    title: finalTitle,
+                    content: finalAnswer,
+                    status: format,
+                    wordpress_username: settings.wordpress_username,
+                    application_password: settings.application_password,
+                    siteurl: settings.siteurl
+                  });
+                }
+
                 res.write(`event: message\ndata: ${JSON.stringify({ title: finalTitle, answer: finalAnswer })}\n\n`);
                 finalTitle = '';
                 finalAnswer = '';

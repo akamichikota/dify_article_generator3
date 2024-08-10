@@ -135,11 +135,11 @@ const Settings = ({ fetchSettings }) => {
       <div className="form-group">
         <label>
           WordPressアプリケーションパスワード
-          <textarea
+          <input
+            type="password" // 変更: パスワードを隠す
             value={applicationPassword}
             onChange={(e) => setApplicationPassword(e.target.value || '')}
             placeholder="WordPressのアプリケーションパスワードを入力"
-            rows="1"
             className="w-full p-2 border border-gray-300 rounded text-black"
           />
         </label>
@@ -178,7 +178,7 @@ const Settings = ({ fetchSettings }) => {
         <label>
           Dify APIキー
           <input
-            type="text"
+            type="password" // 変更: パスワードを隠す
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value || '')}
             placeholder="DifyのAPIキーを入力"
