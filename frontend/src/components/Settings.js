@@ -17,28 +17,34 @@ const Settings = ({ fetchSettings }) => {
   const [rakkokeywordUrl, setRakkokeywordUrl] = useState(''); // 追加: ラッコキーワードURLの状態
 
   useEffect(() => {
-    // 設定を取得する
-    const fetchSettings = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL}/settings`);
-        setTitlePrompt(response.data.title_prompt || ''); // 空白の場合は空文字列に設定
-        setContentPrompt(response.data.content_prompt || ''); // 空白の場合は空文字列に設定
-        setApiEndpoint(response.data.api_endpoint || ''); // 空白の場合は空文字列に設定
-        setApiKey(response.data.api_key || ''); // 空白の場合は空文字列に設定       
-        setWordpressUsername(response.data.wordpress_username || ''); // WordPressユーザー名を設定
-        setApplicationPassword(response.data.application_password || ''); // アプリケーションパスワードを設定
-        setSiteUrl(response.data.siteurl || ''); // サイトURLを設定
-        setVariable1(response.data.variable1 || ''); // 空白の場合は空文字列に設定
-        setVariable2(response.data.variable2 || ''); // 空白の場合は空文字列に設定
-        setKeywordGeneratorUrl(response.data.keyword_generator_url || ''); // 追加: キーワード生成URLを設定
-        setXServerUrl(response.data.x_server_url || ''); // 追加: XサーバーURLを設定
-        setRakkokeywordUrl(response.data.rakkokeyword_url || ''); // 追加: ラッコキーワードURLを設定
-      } catch (error) {
-        console.error('設定の取得中にエラーが発生しました:', error);
-      }
+    // ローカルストレージから設定を取得
+    const storedSettings = {
+      title_prompt: localStorage.getItem('title_prompt') || '',
+      content_prompt: localStorage.getItem('content_prompt') || '',
+      api_endpoint: localStorage.getItem('api_endpoint') || '',
+      api_key: localStorage.getItem('api_key') || '',
+      wordpress_username: localStorage.getItem('wordpress_username') || '',
+      application_password: localStorage.getItem('application_password') || '',
+      siteurl: localStorage.getItem('siteurl') || '',
+      variable1: localStorage.getItem('variable1') || '',
+      variable2: localStorage.getItem('variable2') || '',
+      keyword_generator_url: localStorage.getItem('keyword_generator_url') || '',
+      x_server_url: localStorage.getItem('x_server_url') || '',
+      rakkokeyword_url: localStorage.getItem('rakkokeyword_url') || '',
     };
 
-    fetchSettings();
+    setTitlePrompt(storedSettings.title_prompt);
+    setContentPrompt(storedSettings.content_prompt);
+    setApiEndpoint(storedSettings.api_endpoint);
+    setApiKey(storedSettings.api_key);
+    setWordpressUsername(storedSettings.wordpress_username);
+    setApplicationPassword(storedSettings.application_password);
+    setSiteUrl(storedSettings.siteurl);
+    setVariable1(storedSettings.variable1);
+    setVariable2(storedSettings.variable2);
+    setKeywordGeneratorUrl(storedSettings.keyword_generator_url);
+    setXServerUrl(storedSettings.x_server_url);
+    setRakkokeywordUrl(storedSettings.rakkokeyword_url);
   }, []);
 
   const handleSave = async () => {
@@ -57,6 +63,20 @@ const Settings = ({ fetchSettings }) => {
         x_server_url: xServerUrl,
         rakkokeyword_url: rakkokeywordUrl
       });
+
+      // 設定をローカルストレージに保存
+      localStorage.setItem('title_prompt', titlePrompt);
+      localStorage.setItem('content_prompt', contentPrompt);
+      localStorage.setItem('api_endpoint', apiEndpoint);
+      localStorage.setItem('api_key', apiKey);
+      localStorage.setItem('wordpress_username', wordpressUsername);
+      localStorage.setItem('application_password', applicationPassword);
+      localStorage.setItem('siteurl', siteUrl);
+      localStorage.setItem('variable1', variable1);
+      localStorage.setItem('variable2', variable2);
+      localStorage.setItem('keyword_generator_url', keywordGeneratorUrl);
+      localStorage.setItem('x_server_url', xServerUrl);
+      localStorage.setItem('rakkokeyword_url', rakkokeywordUrl);
 
       // 設定が保存された後に最新の設定を取得
       console.log('設定が保存されました。fetchSettingsを呼び出します。');
