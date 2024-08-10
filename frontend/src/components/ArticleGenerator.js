@@ -16,7 +16,7 @@ const ArticleGenerator = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [format, setFormat] = useState(() => {
-    return localStorage.getItem('format') || 'デモ'; // デフォルトはデモ
+    return localStorage.getItem('format') || 'demo'; // デフォルトは'demo'
   });
 
   // コンポーネントがマウントされたときに環境変数をログに出力
@@ -25,6 +25,7 @@ const ArticleGenerator = () => {
   }, []);
 
   useEffect(() => {
+    console.log('Current Format:', format); // 追加: formatの現在の値をログに出力
     localStorage.setItem('repeatCount', repeatCount);
     localStorage.setItem('format', format);
     localStorage.setItem('articles', JSON.stringify(articles)); // 記事をlocalStorageに保存
@@ -39,7 +40,19 @@ const ArticleGenerator = () => {
   };
 
   const handleFormatChange = (event) => {
-    setFormat(event.target.value);
+    const selectedFormat = event.target.value;
+    console.log('Selected Format:', selectedFormat); // デバッグ用
+
+    // 英語のフォーマットを取得
+    const formatMap = {
+      'demo': 'demo',
+      'publish': 'publish', // 変更: 'public'から'publish'に変更
+      'draft': 'draft'
+    };
+
+    // 英語のフォーマットを設定
+    setFormat(formatMap[selectedFormat] || 'demo'); // デフォルトは'demo'
+    console.log('Updated Format:', formatMap[selectedFormat] || 'demo'); // デバッグ用
   };
 
   const generateArticles = async () => {
@@ -58,14 +71,8 @@ const ArticleGenerator = () => {
       repeatedKeywords.push(...keywords);
     }
 
-    const formatMap = {
-      'public': '公開',
-      'draft': '下書き',
-      'demo': 'デモ'
-    };
-    const japaneseFormat = formatMap[format] || 'デモ';
-
-    const apiUrl = `${process.env.REACT_APP_API_URL}/generate-articles?query=${encodeURIComponent(repeatedKeywords.join(', '))}&format=${japaneseFormat}`;
+    // ここで英語のフォーマットを使用
+    const apiUrl = `${process.env.REACT_APP_API_URL}/generate-articles?query=${encodeURIComponent(repeatedKeywords.join(', '))}&format=${format}`;
     console.log('API URL:', apiUrl); // 追加: API URLをログに出力
 
     try {
@@ -114,7 +121,8 @@ const ArticleGenerator = () => {
 
   return (
     <div className="p-4">
-      キーワード
+      <p className="text-left text-2xl mb-4 mt-4">記事生成</p>
+      キーワード入力
       <textarea
         value={keywordsText}
         onChange={handleChange}
@@ -137,7 +145,7 @@ const ArticleGenerator = () => {
           <span className="ml-4">生成形式</span>
           <select value={format} onChange={handleFormatChange} className="ml-2 p-1 border border-gray-300 rounded text-black">
             <option value="demo">デモ</option>
-            <option value="public">公開</option>
+            <option value="publish">公開</option>
             <option value="draft">下書き</option>
           </select>
         </div>

@@ -41,9 +41,9 @@ let settings = {
   api_key: '', // デフォルトを空文字列に設定
   variable1: '', // デフォルトを空文字列に設定
   variable2: '', // デフォルトを空文字列に設定
-  variable3: '', // デフォルトを空文字列に設定
-  variable4: '', // デフォルトを空文字列に設定
-  variable5: '', // デフォルトを空文字列に設定
+  wordpress_username: '', // 新しいフィールドを追加
+  application_password: '', // 新しいフィールドを追加
+  siteurl: '', // 新しいフィールドを追加
   keyword_generator_url: '', // 新しいフィールドを追加
   x_server_url: '', // 新しいフィールドを追加
   rakkokeyword_url: '' // 新しいフィールドを追加
@@ -59,7 +59,7 @@ app.get('/settings', (req, res) => {
 app.post('/settings', (req, res) => {
   console.log('POST /settings リクエストを受信しました:', req.body); // 追加: リクエストボディをログに出力
   try {
-    const { title_prompt, content_prompt, api_endpoint, api_key, variable1, variable2, variable3, variable4, variable5, keyword_generator_url, x_server_url, rakkokeyword_url } = req.body;
+    const { title_prompt, content_prompt, api_endpoint, api_key, variable1, variable2, wordpress_username, application_password, siteurl, keyword_generator_url, x_server_url, rakkokeyword_url } = req.body;
     
     // 受信したデータを設定に保存
     settings.title_prompt = title_prompt || '';
@@ -68,9 +68,9 @@ app.post('/settings', (req, res) => {
     settings.api_key = api_key || '';
     settings.variable1 = variable1 || '';
     settings.variable2 = variable2 || '';
-    settings.variable3 = variable3 || '';
-    settings.variable4 = variable4 || '';
-    settings.variable5 = variable5 || '';
+    settings.wordpress_username = wordpress_username || ''; // 変更
+    settings.application_password = application_password || ''; // 変更
+    settings.siteurl = siteurl || ''; // 変更
     settings.keyword_generator_url = keyword_generator_url || ''; // URLを保存
     settings.x_server_url = x_server_url || ''; // URLを保存
     settings.rakkokeyword_url = rakkokeyword_url || ''; // URLを保存
@@ -93,9 +93,9 @@ app.get('/generate-articles', async (req, res) => {
   const contentPrompt = settings.content_prompt || DEFAULT_CONTENT_PROMPT; // デフォルト値を設定
   const variable1 = settings.variable1 || '';
   const variable2 = settings.variable2 || '';
-  const variable3 = settings.variable3 || '';
-  const variable4 = settings.variable4 || '';
-  const variable5 = settings.variable5 || '';
+  const wordpressUsername = settings.wordpress_username || ''; // 変更
+  const applicationPassword = settings.application_password || ''; // 変更
+  const siteUrl = settings.siteurl || ''; // 変更
 
   console.log(`記事生成リクエストを受信しました: ${query}`);
 
@@ -109,9 +109,9 @@ app.get('/generate-articles', async (req, res) => {
           format: format,
           variable1: variable1,
           variable2: variable2,
-          variable3: variable3,
-          variable4: variable4,
-          variable5: variable5
+          wordpress_username: wordpressUsername, // 変更
+          application_password: applicationPassword, // 変更
+          siteurl: siteUrl // 変更
         },
         query: keyword,
         response_mode: "streaming",

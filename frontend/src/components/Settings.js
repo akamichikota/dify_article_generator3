@@ -1,19 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import AdvancedSettingsModal from './AdvancedSettingsModal';
 
 const Settings = ({ fetchSettings }) => {
   const [titlePrompt, setTitlePrompt] = useState(''); // 初期値を空文字列に設定
   const [contentPrompt, setContentPrompt] = useState(''); // 初期値を空文字列に設定
   const [apiEndpoint, setApiEndpoint] = useState(''); // 初期値を空文字列に設定
   const [apiKey, setApiKey] = useState(''); // 初期値を空文字列に設定
+  const [wordpressUsername, setWordpressUsername] = useState(''); // WordPressユーザー名
+  const [applicationPassword, setApplicationPassword] = useState(''); // アプリケーションパスワード
+  const [siteUrl, setSiteUrl] = useState(''); // サイトURL
   const [variable1, setVariable1] = useState(''); // 初期値を空文字列に設定
   const [variable2, setVariable2] = useState(''); // 初期値を空文字列に設定
-  const [variable3, setVariable3] = useState(''); // 初期値を空文字列に設定
-  const [variable4, setVariable4] = useState(''); // 初期値を空文字列に設定
-  const [variable5, setVariable5] = useState(''); // 初期値を空文字列に設定
   const [message, setMessage] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [keywordGeneratorUrl, setKeywordGeneratorUrl] = useState(''); // : キーワード生成URLの状態
   const [xServerUrl, setXServerUrl] = useState(''); // 追加: XサーバーURLの状態
   const [rakkokeywordUrl, setRakkokeywordUrl] = useState(''); // 追加: ラッコキーワードURLの状態
@@ -26,12 +24,12 @@ const Settings = ({ fetchSettings }) => {
         setTitlePrompt(response.data.title_prompt || ''); // 空白の場合は空文字列に設定
         setContentPrompt(response.data.content_prompt || ''); // 空白の場合は空文字列に設定
         setApiEndpoint(response.data.api_endpoint || ''); // 空白の場合は空文字列に設定
-        setApiKey(response.data.api_key || ''); // 空白の場合は空文字列に設定
+        setApiKey(response.data.api_key || ''); // 空白の場合は空文字列に設定       
+        setWordpressUsername(response.data.wordpress_username || ''); // WordPressユーザー名を設定
+        setApplicationPassword(response.data.application_password || ''); // アプリケーションパスワードを設定
+        setSiteUrl(response.data.siteurl || ''); // サイトURLを設定
         setVariable1(response.data.variable1 || ''); // 空白の場合は空文字列に設定
         setVariable2(response.data.variable2 || ''); // 空白の場合は空文字列に設定
-        setVariable3(response.data.variable3 || ''); // 空白の場合は空文字列に設定
-        setVariable4(response.data.variable4 || ''); // 空白の場合は空文字列に設定
-        setVariable5(response.data.variable5 || ''); // 空白の場合は空文字列に設定
         setKeywordGeneratorUrl(response.data.keyword_generator_url || ''); // 追加: キーワード生成URLを設定
         setXServerUrl(response.data.x_server_url || ''); // 追加: XサーバーURLを設定
         setRakkokeywordUrl(response.data.rakkokeyword_url || ''); // 追加: ラッコキーワードURLを設定
@@ -50,11 +48,11 @@ const Settings = ({ fetchSettings }) => {
         content_prompt: contentPrompt,
         api_endpoint: apiEndpoint,
         api_key: apiKey,
+        wordpress_username: wordpressUsername, // WordPressユーザー名を送信
+        application_password: applicationPassword, // アプリケーションパスワードを送信
+        siteurl: siteUrl, // サイトURLを送信
         variable1: variable1,
         variable2: variable2,
-        variable3: variable3,
-        variable4: variable4,
-        variable5: variable5,
         keyword_generator_url: keywordGeneratorUrl,
         x_server_url: xServerUrl,
         rakkokeyword_url: rakkokeywordUrl
@@ -75,6 +73,7 @@ const Settings = ({ fetchSettings }) => {
 
   return (
     <div className="p-4">
+      <p className="text-left text-2xl mb-4 mt-4">基本設定</p>
       <div className="mb-4">
         <label className="block">
           タイトル生成プロンプト
@@ -101,41 +100,136 @@ const Settings = ({ fetchSettings }) => {
           />
         </label>
       </div>
-      <div className="flex justify-between">
-        <span className="p-2 bg-transparent border-none text-transparent" style={{ cursor: 'default' }}>　　　　</span>
+      <div className="form-group">
+        <label>
+          WordPressユーザー名
+          <textarea
+            value={wordpressUsername}
+            onChange={(e) => setWordpressUsername(e.target.value || '')}
+            placeholder="WordPressユーザー名を入力"
+            rows="1"
+            className="w-full p-2 border border-gray-300 rounded text-black"
+          />
+        </label>
+      </div>
+      <div className="form-group">
+        <label>
+          WordPressアプリケーションパスワード
+          <textarea
+            value={applicationPassword}
+            onChange={(e) => setApplicationPassword(e.target.value || '')}
+            placeholder="WordPressのアプリケーションパスワードを入力"
+            rows="1"
+            className="w-full p-2 border border-gray-300 rounded text-black"
+          />
+        </label>
+      </div>
+      <div className="form-group">
+        <label>
+          WordPressサイトURL
+          <textarea
+            value={siteUrl}
+            onChange={(e) => setSiteUrl(e.target.value || '')}
+            placeholder="WordPressサイトURLを入力"
+            rows="1"
+            className="w-full p-2 border border-gray-300 rounded text-black"
+          />
+        </label>
+      </div>
+      <div className="flex justify-center">
         <button onClick={handleSave} className="px-4 py-2 bg-magic-blue text-white rounded hover:bg-magic-green">保存</button>
-        <button onClick={() => setIsModalOpen(true)} className="p-2 bg-gray-500 text-white rounded hover:bg-gray-700">特殊設定</button>
       </div>
       {message && <p className="mt-4 text-green-500 text-center">{message}</p>}
-      <AdvancedSettingsModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        apiEndpoint={apiEndpoint}
-        setApiEndpoint={setApiEndpoint}
-        apiKey={apiKey}
-        setApiKey={setApiKey}
-        variable1={variable1}
-        setVariable1={setVariable1}
-        variable2={variable2}
-        setVariable2={setVariable2}
-        variable3={variable3}
-        setVariable3={setVariable3}
-        variable4={variable4}
-        setVariable4={setVariable4}
-        variable5={variable5}
-        setVariable5={setVariable5}
-        keywordGeneratorUrl={keywordGeneratorUrl}
-        setKeywordGeneratorUrl={setKeywordGeneratorUrl}
-        xServerUrl={xServerUrl}
-        setXServerUrl={setXServerUrl}
-        rakkokeywordUrl={rakkokeywordUrl}
-        setRakkokeywordUrl={setRakkokeywordUrl}
-        fetchSettings={fetchSettings} // ここでfetchSettingsを渡す
-        titlePrompt={titlePrompt} // 追加
-        setTitlePrompt={setTitlePrompt} // 追加
-        contentPrompt={contentPrompt} // 追加
-        setContentPrompt={setContentPrompt} // 追加
-      />
+      
+      <p className="text-left text-2xl mb-4 mt-4">高度な設定</p>
+      <div className="form-group">
+        <label>
+          Dify APIエンドポイント
+          <input
+            type="text"
+            value={apiEndpoint}
+            onChange={(e) => setApiEndpoint(e.target.value || '')}
+            placeholder="DifyのAPIエンドポイントを入力"
+            className="w-full p-2 border border-gray-300 rounded text-black"
+          />
+        </label>
+      </div>
+      <div className="form-group">
+        <label>
+          Dify APIキー
+          <input
+            type="text"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value || '')}
+            placeholder="DifyのAPIキーを入力"
+            className="w-full p-2 border border-gray-300 rounded text-black"
+          />
+        </label>
+      </div>
+      <div className="form-group">
+        <label>
+          変数１
+          <textarea
+            value={variable1}
+            onChange={(e) => setVariable1(e.target.value || '')}
+            placeholder="変数１を入力"
+            rows="4"
+            className="w-full p-2 border border-gray-300 rounded text-black"
+          />
+        </label>
+      </div>
+      <div className="form-group">
+        <label>
+          変数２
+          <textarea
+            value={variable2}
+            onChange={(e) => setVariable2(e.target.value || '')}
+            placeholder="変数２を入力"
+            rows="4"
+            className="w-full p-2 border border-gray-300 rounded text-black"
+          />
+        </label>
+      </div>
+      <div className="form-group">
+        <label>
+          キーワード生成URL
+          <input
+            type="text"
+            value={keywordGeneratorUrl}
+            onChange={(e) => setKeywordGeneratorUrl(e.target.value || '')}
+            placeholder="キーワード生成のURLを入力"
+            className="w-full p-2 border border-gray-300 rounded text-black"
+          />
+        </label>
+      </div>
+      <div className="form-group">
+        <label>
+          XサーバーURL
+          <input
+            type="text"
+            value={xServerUrl}
+            onChange={(e) => setXServerUrl(e.target.value || '')}
+            placeholder="XサーバーのURLを入力"
+            className="w-full p-2 border border-gray-300 rounded text-black"
+          />
+        </label>
+      </div>
+      <div className="form-group">
+        <label>
+          ラッコキーワードURL
+          <input
+            type="text"
+            value={rakkokeywordUrl}
+            onChange={(e) => setRakkokeywordUrl(e.target.value || '')}
+            placeholder="ラッコキーワードのURLを入力"
+            className="w-full p-2 border border-gray-300 rounded text-black"
+          />
+        </label>
+      </div>
+      <div className="flex justify-center">
+        <button onClick={handleSave} className="px-4 py-2 bg-magic-blue text-white rounded hover:bg-magic-green">保存</button>
+      </div>
+      {message && <p className="mt-4 text-green-500 text-center">{message}</p>}
     </div>
   );
 };
