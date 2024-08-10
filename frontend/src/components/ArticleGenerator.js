@@ -121,12 +121,11 @@ const ArticleGenerator = () => {
 
   return (
     <div className="p-4">
-      <p className="text-left text-2xl mb-4 mt-4">記事生成</p>
+      <p className="text-left text-2xl mb-4 mt-10">記事生成</p>
       キーワード入力
       <textarea
         value={keywordsText}
         onChange={handleChange}
-        placeholder="記事に含めるキーワードを入力"
         rows="10"
         cols="30"
         className="w-full p-2 border border-gray-300 rounded text-black"

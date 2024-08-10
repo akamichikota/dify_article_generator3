@@ -22,7 +22,7 @@ router.post('/post-to-wordpress', async (req, res) => {
   });
 
   // WordPressのREST APIエンドポイント
-  const wordpressApiUrl = `${siteurl}/wp-json/wp/v2/posts`;
+  const wordpressApiUrl = `${siteurl.replace(/\/$/, '')}/wp-json/wp/v2/posts`;
 
   try {
     const response = await axios.post(wordpressApiUrl, {

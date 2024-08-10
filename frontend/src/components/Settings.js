@@ -12,9 +12,9 @@ const Settings = ({ fetchSettings }) => {
   const [variable1, setVariable1] = useState(''); // 初期値を空文字列に設定
   const [variable2, setVariable2] = useState(''); // 初期値を空文字列に設定
   const [message, setMessage] = useState('');
-  const [keywordGeneratorUrl, setKeywordGeneratorUrl] = useState(''); // : キーワード生成URLの状態
-  const [xServerUrl, setXServerUrl] = useState(''); // 追加: XサーバーURLの状態
   const [rakkokeywordUrl, setRakkokeywordUrl] = useState(''); // 追加: ラッコキーワードURLの状態
+  const [xServerUrl, setXServerUrl] = useState(''); // 追加: XサーバーURLの状態
+  const [keywordGeneratorUrl, setKeywordGeneratorUrl] = useState(''); // : キーワード生成URLの状態
 
   useEffect(() => {
     // ローカルストレージから設定を取得
@@ -28,9 +28,9 @@ const Settings = ({ fetchSettings }) => {
       siteurl: localStorage.getItem('siteurl') || '',
       variable1: localStorage.getItem('variable1') || '',
       variable2: localStorage.getItem('variable2') || '',
-      keyword_generator_url: localStorage.getItem('keyword_generator_url') || '',
-      x_server_url: localStorage.getItem('x_server_url') || '',
       rakkokeyword_url: localStorage.getItem('rakkokeyword_url') || '',
+      x_server_url: localStorage.getItem('x_server_url') || '',
+      keyword_generator_url: localStorage.getItem('keyword_generator_url') || '',
     };
 
     setTitlePrompt(storedSettings.title_prompt);
@@ -93,14 +93,13 @@ const Settings = ({ fetchSettings }) => {
 
   return (
     <div className="p-4">
-      <p className="text-left text-2xl mb-4 mt-4">基本設定</p>
+      <p className="text-left text-2xl mb-4 mt-10">基本設定</p>
       <div className="mb-4">
         <label className="block">
           タイトル生成プロンプト
           <textarea
             value={titlePrompt}
             onChange={(e) => setTitlePrompt(e.target.value || '')}
-            placeholder="どんなタイトルにしたいかを入力"
             rows="4"
             cols="50"
             className="w-full p-2 border border-gray-300 rounded text-black"
@@ -113,7 +112,6 @@ const Settings = ({ fetchSettings }) => {
           <textarea
             value={contentPrompt}
             onChange={(e) => setContentPrompt(e.target.value || '')}
-            placeholder="記事生成において考慮してほしいことを入力"
             rows="4"
             cols="50"
             className="w-full p-2 border border-gray-300 rounded text-black"
@@ -126,7 +124,6 @@ const Settings = ({ fetchSettings }) => {
           <textarea
             value={wordpressUsername}
             onChange={(e) => setWordpressUsername(e.target.value || '')}
-            placeholder="WordPressユーザー名を入力"
             rows="1"
             className="w-full p-2 border border-gray-300 rounded text-black"
           />
@@ -136,10 +133,9 @@ const Settings = ({ fetchSettings }) => {
         <label>
           WordPressアプリケーションパスワード
           <input
-            type="password" // 変更: パスワードを隠す
+            type="password"
             value={applicationPassword}
             onChange={(e) => setApplicationPassword(e.target.value || '')}
-            placeholder="WordPressのアプリケーションパスワードを入力"
             className="w-full p-2 border border-gray-300 rounded text-black"
           />
         </label>
@@ -150,7 +146,6 @@ const Settings = ({ fetchSettings }) => {
           <textarea
             value={siteUrl}
             onChange={(e) => setSiteUrl(e.target.value || '')}
-            placeholder="WordPressサイトURLを入力"
             rows="1"
             className="w-full p-2 border border-gray-300 rounded text-black"
           />
@@ -169,7 +164,6 @@ const Settings = ({ fetchSettings }) => {
             type="text"
             value={apiEndpoint}
             onChange={(e) => setApiEndpoint(e.target.value || '')}
-            placeholder="DifyのAPIエンドポイントを入力"
             className="w-full p-2 border border-gray-300 rounded text-black"
           />
         </label>
@@ -178,10 +172,9 @@ const Settings = ({ fetchSettings }) => {
         <label>
           Dify APIキー
           <input
-            type="password" // 変更: パスワードを隠す
+            type="password"
             value={apiKey}
             onChange={(e) => setApiKey(e.target.value || '')}
-            placeholder="DifyのAPIキーを入力"
             className="w-full p-2 border border-gray-300 rounded text-black"
           />
         </label>
@@ -192,7 +185,6 @@ const Settings = ({ fetchSettings }) => {
           <textarea
             value={variable1}
             onChange={(e) => setVariable1(e.target.value || '')}
-            placeholder="変数１を入力"
             rows="4"
             className="w-full p-2 border border-gray-300 rounded text-black"
           />
@@ -204,32 +196,7 @@ const Settings = ({ fetchSettings }) => {
           <textarea
             value={variable2}
             onChange={(e) => setVariable2(e.target.value || '')}
-            placeholder="変数２を入力"
             rows="4"
-            className="w-full p-2 border border-gray-300 rounded text-black"
-          />
-        </label>
-      </div>
-      <div className="form-group">
-        <label>
-          キーワード生成URL
-          <input
-            type="text"
-            value={keywordGeneratorUrl}
-            onChange={(e) => setKeywordGeneratorUrl(e.target.value || '')}
-            placeholder="キーワード生成のURLを入力"
-            className="w-full p-2 border border-gray-300 rounded text-black"
-          />
-        </label>
-      </div>
-      <div className="form-group">
-        <label>
-          XサーバーURL
-          <input
-            type="text"
-            value={xServerUrl}
-            onChange={(e) => setXServerUrl(e.target.value || '')}
-            placeholder="XサーバーのURLを入力"
             className="w-full p-2 border border-gray-300 rounded text-black"
           />
         </label>
@@ -241,7 +208,28 @@ const Settings = ({ fetchSettings }) => {
             type="text"
             value={rakkokeywordUrl}
             onChange={(e) => setRakkokeywordUrl(e.target.value || '')}
-            placeholder="ラッコキーワードのURLを入力"
+            className="w-full p-2 border border-gray-300 rounded text-black"
+          />
+        </label>
+      </div>
+      <div className="form-group">
+        <label>
+          XサーバーURL
+          <input
+            type="text"
+            value={xServerUrl}
+            onChange={(e) => setXServerUrl(e.target.value || '')}
+            className="w-full p-2 border border-gray-300 rounded text-black"
+          />
+        </label>
+      </div>
+      <div className="form-group">
+        <label>
+          キーワード生成URL
+          <input
+            type="text"
+            value={keywordGeneratorUrl}
+            onChange={(e) => setKeywordGeneratorUrl(e.target.value || '')}
             className="w-full p-2 border border-gray-300 rounded text-black"
           />
         </label>
