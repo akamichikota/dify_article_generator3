@@ -25,7 +25,11 @@ const AdvancedSettingsModal = ({
   setXServerUrl,
   rakkokeywordUrl,
   setRakkokeywordUrl,
-  fetchSettings // ここで受け取る
+  fetchSettings,
+  titlePrompt,
+  setTitlePrompt,
+  contentPrompt,
+  setContentPrompt
 }) => {
   const [successMessage, setSuccessMessage] = useState(''); // 成功メッセージの状態を追加
   const [errorMessage, setErrorMessage] = useState(''); // エラーメッセージの状態を追加
@@ -56,13 +60,22 @@ const AdvancedSettingsModal = ({
       setSuccessMessage('設定が保存されました');
 
       // 親コンポーネントの状態を更新
+      setApiEndpoint(apiEndpoint);
+      setApiKey(apiKey);
+      setVariable1(variable1);
+      setVariable2(variable2);
+      setVariable3(variable3);
+      setVariable4(variable4);
+      setVariable5(variable5);
       setKeywordGeneratorUrl(keywordGeneratorUrl);
       setXServerUrl(xServerUrl);
       setRakkokeywordUrl(rakkokeywordUrl);
+      setTitlePrompt(titlePrompt); // 追加
+      setContentPrompt(contentPrompt); // 追加
 
       // ここでfetchSettingsを呼び出す
       console.log('fetchSettingsを呼び出します。');
-      await fetchSettings(); // これを追加
+      await fetchSettings();
 
       setTimeout(() => setSuccessMessage(''), 2000);
     } catch (error) {

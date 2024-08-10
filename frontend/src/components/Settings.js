@@ -14,7 +14,7 @@ const Settings = ({ fetchSettings }) => {
   const [variable5, setVariable5] = useState(''); // 初期値を空文字列に設定
   const [message, setMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [keywordGeneratorUrl, setKeywordGeneratorUrl] = useState(''); // ���: キーワード生成URLの状態
+  const [keywordGeneratorUrl, setKeywordGeneratorUrl] = useState(''); // : キーワード生成URLの状態
   const [xServerUrl, setXServerUrl] = useState(''); // 追加: XサーバーURLの状態
   const [rakkokeywordUrl, setRakkokeywordUrl] = useState(''); // 追加: ラッコキーワードURLの状態
 
@@ -131,6 +131,10 @@ const Settings = ({ fetchSettings }) => {
         rakkokeywordUrl={rakkokeywordUrl}
         setRakkokeywordUrl={setRakkokeywordUrl}
         fetchSettings={fetchSettings} // ここでfetchSettingsを渡す
+        titlePrompt={titlePrompt} // 追加
+        setTitlePrompt={setTitlePrompt} // 追加
+        contentPrompt={contentPrompt} // 追加
+        setContentPrompt={setContentPrompt} // 追加
       />
     </div>
   );
